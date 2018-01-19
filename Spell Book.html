@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<!-- saved from url=(0039)http://spellbookgen.azurewebsites.net/# -->
+<html ng-app="spellbook" class="ng-scope"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\:form{display:block;}</style>
+        <title>Spell Book</title>
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+        
+        <link rel="stylesheet" href="spellBook.css">
+    </head>
+    <body>
+        <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+        <script type="text/javascript" src="js/app.js"></script>
+        <script type="text/javascript" src="js/filters.js"></script>
+        <script type="text/javascript" src="js/spellPanel.js"></script>
+        <script type="text/javascript" src="js/spellListPanels.js"></script>
+        <script type="text/javascript" src="js/spellEditor.js"></script>
+        <script type="text/javascript" src="js/tempTextFixer.js"></script>
+        <script type="text/javascript" src="js/spellDataService.js"></script>
+        <script type="text/javascript" src="js/classSpellList.js"></script>
+        <script type="text/javascript" src="js/mainCtrl.js"></script>
+        <script type="text/javascript" src="js/spellbookEditor.js"></script>
+        <script type="text/javascript" src="js/importExport.js"></script>
+        
+        <h1 class="text-center hidden-print">Spellbook Generator</h1>
+
+        <div ng-controller="mainCtrl as mainCtrl" class="container ng-scope">
+            <section class="col-sm-12 hidden-print">
+                <ul class="nav nav-pills">
+                    <li ng-class="{active:mainCtrl.isSelected(1)}" class=""><a href="http://spellbookgen.azurewebsites.net/#" ng-click="mainCtrl.selectTab(1)">Quick Search</a></li>
+                    <li ng-class="{active:mainCtrl.isSelected(2)}" class="active"><a href="http://spellbookgen.azurewebsites.net/#" ng-click="mainCtrl.selectTab(2)">Spellbooks</a></li>
+                    <li ng-class="{active:mainCtrl.isSelected(3)}" class=""><a href="http://spellbookgen.azurewebsites.net/#" ng-click="mainCtrl.selectTab(3)">Class Spell Lists</a></li>
+                    <li ng-class="{active:mainCtrl.isSelected(4)}"><a href="http://spellbookgen.azurewebsites.net/#" ng-click="mainCtrl.selectTab(4)">Add Spells</a></li>
+                    <li ng-class="{active:mainCtrl.isSelected(5)}"><a href="http://spellbookgen.azurewebsites.net/#" ng-click="mainCtrl.selectTab(5)">Import/Export</a></li>
+                    <li ng-class="{active:mainCtrl.isSelected(6)}"><a href="http://spellbookgen.azurewebsites.net/#" ng-click="mainCtrl.selectTab(6)">About</a></li>
+                    <li ng-class="{active:mainCtrl.isSelected(7)}"><a href="http://spellbookgen.azurewebsites.net/#" ng-click="mainCtrl.selectTab(7)">Help</a></li>
+                </ul>
+                <p>&nbsp;</p>
+            </section>
+            
+            <div class="panel ng-hide" ng-show="mainCtrl.isSelected(1)">
+                <spell-list-panels><div class="container">
+    <div>
+        Name: <input type="text" class="form-control ng-pristine ng-untouched ng-valid" ng-model="searchName" placeholder="Enter any part of the spell&#39;s name here" style="">
+    <span style="opacity: 1; background-size: 19px 13px; left: 0px; top: -6.5px; width: 19px; min-width: 19px; height: 13px; position: absolute; background-image: url(&quot;data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB3aWR0aD0nMTcnIGhlaWdodD0nMTInIHZpZXdCb3g9JzAgMCAxNyAxMic+IDxkZWZzPiA8cGF0aCBpZD0nYScgZD0nTTcuOTA5IDEuNDYybDIuMTIxLjg2NHMtLjY3MS4xMy0xLjIwOS4yOTRjMCAwIC40MzcuNjM0Ljc3LjkzOC4zOTEtLjE4LjY1Ny0uMjQ4LjY1Ny0uMjQ4LS44MTEgMS42NjgtMi45NzkgMi43MDMtNC41MyAyLjcwMy0uMDkzIDAtLjQ4Mi0uMDA2LS43MjcuMDE1LS40MzUuMDIxLS41ODEuMzgtLjM3NC40NzMuMzczLjIwMSAxLjE0My42NjIuOTU4IDEuMDA5QzUuMiA4LjAwMy45OTkgMTEgLjk5OSAxMWwuNjQ4Ljg4Nkw2LjEyOSA4LjYzQzguNjAyIDYuOTQ4IDEyLjAwNiA2IDE1IDZoM1Y1aC00LjAwMWMtMS4wNTggMC0yLjA0LjEyMi0yLjQ3My0uMDItLjQwMi0uMTMzLS41MDItLjY3OS0uNDU1LTEuMDM1YTcuODcgNy44NyAwIDAgMSAuMTg3LS43MjljLjAyOC0uMDk5LjA0Ni0uMDc3LjE1NS0uMDk5LjU0LS4xMTIuNzc3LS4wOTUuODIxLS4xNi4xNDYtLjI0NS4yNTQtLjk3NC4yNTQtLjk3NEw3LjU2OS4zODlzLjIwMiAxLjAxMy4zNCAxLjA3M3onLz4gPC9kZWZzPiA8dXNlIGZpbGw9JyMwMDdDOTcnIGZpbGwtcnVsZT0nZXZlbm9kZCcgdHJhbnNmb3JtPSd0cmFuc2xhdGUoLTEpJyB4bGluazpocmVmPScjYScvPiA8L3N2Zz4=&quot;); background-repeat: no-repeat; background-position: 0px 0px; border: none; display: none; visibility: visible; z-index: auto;"></span></div>
+    <p>
+        <em>Maximum 20 results displayed.</em>
+    </p>
+    <div class="row">
+        <!-- ngRepeat: spell in spellListCtrl.spells | filter:{ Name: searchName } | orderBy: 'Name' | limitTo:20 track by $index --><spell-panel can-edit="true" ng-repeat="spell in spellListCtrl.spells | filter:{ Name: searchName } | orderBy: &#39;Name&#39; | limitTo:20 track by $index" spell="spell" class="ng-scope ng-isolate-scope"><div class="panel unbroken">
+    <div>
+        <h2 ng-hide="editing" class="ng-binding">Do the thing 
+        <button ng-show="canEdit" class="btn" ng-click="editing = true"><span class="glyphicon glyphicon-pencil"></span> Edit</button></h2>
+        <h2 ng-show="editing" class="ng-hide"><input type="text" ng-model="spell.Name" class="ng-pristine ng-untouched ng-valid"> <button class="btn" ng-click="spellCtrl.saveData()"><span class="glyphicon glyphicon-save"></span> Save</button></h2>
+    </div>
+
+    <p>
+        </p><div ng-hide="editing">
+            <em ng-show="spell.Level === 0" class="ng-binding ng-hide">Conjuration cantrip</em>
+            <em ng-show="spell.Level &gt; 0" class="ng-binding">1st-level conjuration</em>
+            <em ng-show="spell.IsRitual" class="ng-hide">(ritual)</em>
+        </div>
+        <div ng-show="editing" class="ng-hide">
+            <select ng-model="spell.Level" class="ng-pristine ng-untouched ng-valid">
+                <option value="0">0 (cantrip)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select> 
+            <select ng-model="spell.School" class="ng-pristine ng-untouched ng-valid">
+                <option value="Abjuration">Abjuration</option>
+                <option value="Conjuration">Conjuration</option>
+                <option value="Divination">Divination</option>
+                <option value="Enchantment">Enchantment</option>
+                <option value="Evocation">Evocation</option>
+                <option value="Illusion">Illusion</option>
+                <option value="Necromancy">Necromancy</option>
+                <option value="Transmutation">Transmutation</option>
+            </select>
+            <input type="checkbox" ng-model="spell.IsRitual" class="ng-pristine ng-untouched ng-valid"> Ritual
+        </div>
+    <p></p>
+    
+    <p>
+        </p><div><strong>Casting Time:</strong> <span ng-hide="editing" class="ng-binding">1 Round</span><div ng-show="editing" class="ng-hide"><input ng-model="spell.CastingTime" class="ng-pristine ng-untouched ng-valid"></div></div>
+        <div><strong>Range:</strong> <span ng-hide="editing" class="ng-binding">10 feet</span><div ng-show="editing" class="ng-hide"><input ng-model="spell.Range" class="ng-pristine ng-untouched ng-valid"></div></div>
+        <div>
+            <strong>Components:</strong>
+                <span ng-hide="editing" class="ng-binding">V, S, M (Some dust)</span>
+                <span ng-show="editing" class="ng-hide">
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsVerbal" class="ng-pristine ng-untouched ng-valid"> V</label>
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsSomatic" class="ng-pristine ng-untouched ng-valid"> S</label>
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsMaterial" class="ng-pristine ng-untouched ng-valid"> M</label> <input ng-show="spell.UsesComponentsMaterial" ng-model="spell.ComponentsMaterialDescription" class="ng-pristine ng-untouched ng-valid">
+                </span>
+        </div>
+        <div><strong>Duration:</strong> <span ng-hide="editing" class="ng-binding">1 Round</span><div ng-show="editing" class="ng-hide"><input ng-model="spell.Duration" class="ng-pristine ng-untouched ng-valid"></div></div>
+    <p></p>
+
+    <blockquote>
+        <!-- ngRepeat: paragraph in DescriptionAsParagraphs track by $index --><p class="spellDescription ng-binding ng-scope" ng-repeat="paragraph in DescriptionAsParagraphs track by $index" ng-hide="editing">Does the thing</p><!-- end ngRepeat: paragraph in DescriptionAsParagraphs track by $index -->
+        <p ng-show="editing" class="ng-hide">
+            <textarea class="form-control ng-pristine ng-untouched ng-valid" rows="10" ng-model="spell.Description"></textarea>
+        </p>
+        <p ng-show="spell.AtHigherLevels" class="ng-hide">
+            <strong>At Higher Levels.</strong> <span ng-hide="editing" class="ng-binding"></span></p><div ng-show="editing" class="ng-hide"><strong>At Higher Levels: </strong><input class="form-control ng-pristine ng-untouched ng-valid" ng-model="spell.AtHigherLevels"></div>
+        <p></p>
+    </blockquote>
+</div></spell-panel><!-- end ngRepeat: spell in spellListCtrl.spells | filter:{ Name: searchName } | orderBy: 'Name' | limitTo:20 track by $index -->
+    </div>
+</div></spell-list-panels>
+            </div>
+            
+            <div class="panel" ng-show="mainCtrl.isSelected(2)">
+                <spellbook-editor><div class="container hidden-print">
+    <div class="col-sm-2">
+        <div class="list-group">
+            <!-- ngRepeat: spellbook in spellbookEditorCtrl.spellbookData -->
+            <div class="list-group-item"><button class="btn btn-success btn-xs" ng-click="spellbookEditorCtrl.newSpellbook()">+</button> <strong>New Spellbook</strong></div>
+        </div>
+    </div>
+    <div class="col-sm-10">
+        <p class="row">
+            <button class="btn btn-lg btn-primary" ng-class="{active: spellbookEditorCtrl.displayListEditor}" ng-click="spellbookEditorCtrl.displayListEditor = !spellbookEditorCtrl.displayListEditor">Show Editor</button>
+        </p>
+        <form role="form" class="form-horizontal ng-valid ng-dirty ng-valid-parse ng-hide" ng-show="spellbookEditorCtrl.displayListEditor">
+            <div class="form-group">
+                <label for="spellbookName" class="col-sm-1 control-label">Name:</label>
+                <div class="col-sm-7">
+                    <input type="text" id="spellbookName" class="form-control ng-pristine ng-untouched ng-valid" ng-model="spellbookEditorCtrl.selectedSpellbook.Name" placeholder="Name of your character or spellbook" style="">
+                <span style="opacity: 1; background-size: 19px 13px; left: 0px; top: -6.5px; width: 19px; min-width: 19px; height: 13px; position: absolute; background-image: url(&quot;data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB3aWR0aD0nMTcnIGhlaWdodD0nMTInIHZpZXdCb3g9JzAgMCAxNyAxMic+IDxkZWZzPiA8cGF0aCBpZD0nYScgZD0nTTcuOTA5IDEuNDYybDIuMTIxLjg2NHMtLjY3MS4xMy0xLjIwOS4yOTRjMCAwIC40MzcuNjM0Ljc3LjkzOC4zOTEtLjE4LjY1Ny0uMjQ4LjY1Ny0uMjQ4LS44MTEgMS42NjgtMi45NzkgMi43MDMtNC41MyAyLjcwMy0uMDkzIDAtLjQ4Mi0uMDA2LS43MjcuMDE1LS40MzUuMDIxLS41ODEuMzgtLjM3NC40NzMuMzczLjIwMSAxLjE0My42NjIuOTU4IDEuMDA5QzUuMiA4LjAwMy45OTkgMTEgLjk5OSAxMWwuNjQ4Ljg4Nkw2LjEyOSA4LjYzQzguNjAyIDYuOTQ4IDEyLjAwNiA2IDE1IDZoM1Y1aC00LjAwMWMtMS4wNTggMC0yLjA0LjEyMi0yLjQ3My0uMDItLjQwMi0uMTMzLS41MDItLjY3OS0uNDU1LTEuMDM1YTcuODcgNy44NyAwIDAgMSAuMTg3LS43MjljLjAyOC0uMDk5LjA0Ni0uMDc3LjE1NS0uMDk5LjU0LS4xMTIuNzc3LS4wOTUuODIxLS4xNi4xNDYtLjI0NS4yNTQtLjk3NC4yNTQtLjk3NEw3LjU2OS4zODlzLjIwMiAxLjAxMy4zNCAxLjA3M3onLz4gPC9kZWZzPiA8dXNlIGZpbGw9JyMwMDdDOTcnIGZpbGwtcnVsZT0nZXZlbm9kZCcgdHJhbnNmb3JtPSd0cmFuc2xhdGUoLTEpJyB4bGluazpocmVmPScjYScvPiA8L3N2Zz4=&quot;); background-repeat: no-repeat; background-position: 0px 0px; border: none; display: none; visibility: visible; z-index: auto;"></span></div>
+                <div class="col-sm-2">
+                    <button class="btn btn-danger" ng-click="spellbookEditorCtrl.deleteSpellbook()">DELETE</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellbookClass" class="col-sm-1 control-label">Class:</label>
+                <div class="col-sm-5">
+                    <select class="form-control ng-valid ng-dirty ng-valid-parse ng-touched" ng-model="spellbookEditorCtrl.selectedSpellbook.selectedClassID" ng-options="classData.ID as classData.Name for classData in spellbookEditorCtrl.classData"><option value="0" selected="selected" label="Bard">Bard</option><option value="1" label="Cleric">Cleric</option><option value="2" label="Druid">Druid</option><option value="3" label="Paladin">Paladin</option><option value="4" label="Ranger">Ranger</option><option value="5" label="Sorceror">Sorceror</option><option value="6" label="Warlock">Warlock</option><option value="7" label="Wizard">Wizard</option></select>
+                </div>
+                <div class="col-sm-2">
+                    <button class="btn" ng-click="spellbookEditorCtrl.showRandomSettings = !spellbookEditorCtrl.showRandomSettings">
+                        Random
+                        <span class="glyphicon glyphicon-menu-down" ng-hide="spellbookEditorCtrl.showRandomSettings"></span>
+                        <span class="glyphicon glyphicon-menu-up ng-hide" ng-show="spellbookEditorCtrl.showRandomSettings"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group ng-hide" ng-show="spellbookEditorCtrl.showRandomSettings">
+                <div class="col-sm-1">
+                    <label class="control-label" for="randomLevel">Level:</label>
+                </div>
+                <div class="col-sm-4">
+                    <input id="randomLevel" type="number" class="form-control ng-pristine ng-untouched ng-valid" ng-model="spellbookEditorCtrl.randomLevel">
+                </div>
+                <div>
+                    <p><em>Note: hitting Generate will remove all existing spells from this spellbook and replace them with the ones generated!</em></p>
+                    <button class="btn btn-warning" ng-click="spellbookEditorCtrl.generateRandom()">Generate Random Spellbook</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <h2 class="ng-binding">Wizard Spells</h2>
+                    <p><em>Click to add or remove a spell from your spellbook</em></p>
+                    <!-- ngRepeat: level in spellbookEditorCtrl.spellLevelsForSelectedClass | orderBy:level --><div class="list-group-item ng-scope" ng-repeat="level in spellbookEditorCtrl.spellLevelsForSelectedClass | orderBy:level">
+                        <h4>
+                            <span ng-show="level" class="ng-binding">Level 1</span>
+                            <span ng-hide="level" class="ng-hide">Cantrips</span>
+                        </h4>
+                        <!-- ngRepeat: spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellInSelectedClass | filter:{Level:level} --><div class="list-group-item selectable ng-binding ng-scope list-group-item-success" ng-repeat="spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellInSelectedClass | filter:{Level:level}" ng-class="{ &#39;list-group-item-success&#39;: spellbookEditorCtrl.spellKnown(spell), &#39;list-group-item-danger&#39;: !spellbookEditorCtrl.spellKnown(spell) }" ng-click="spellbookEditorCtrl.toggleSpellKnown(spell)">
+                            Do the thing (<em class="ng-binding">Conjuration</em>)<span class="badge ng-hide" ng-show="spell.IsRitual">R</span>
+                        </div><!-- end ngRepeat: spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellInSelectedClass | filter:{Level:level} -->
+                    </div><!-- end ngRepeat: level in spellbookEditorCtrl.spellLevelsForSelectedClass | orderBy:level -->
+                </div>
+                
+                <div class="col-sm-6">
+                    <h2>Known Spells</h2>
+                    <p><em>Click to mark a spell as Prepared</em></p>
+                    <!-- ngRepeat: level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy --><div class="list-group-item ng-scope" ng-repeat="level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy">
+                        <h4>
+                            <span ng-show="level" class="ng-binding">Level 1</span>
+                            <span ng-hide="level" class="ng-hide">Cantrips</span>
+                        </h4>
+                        <!-- ngRepeat: spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellKnown | filter:{Level:level} --><div class="list-group-item selectable ng-binding ng-scope" ng-repeat="spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellKnown | filter:{Level:level}" ng-class="{ active: spellbookEditorCtrl.spellPrepared(spell) }" ng-click="spellbookEditorCtrl.toggleSpellPrepared(spell)">
+                            Do the thing (<em class="ng-binding">Conjuration</em>)<span class="badge ng-hide" ng-show="spell.IsRitual">R</span>
+                        </div><!-- end ngRepeat: spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellKnown | filter:{Level:level} -->
+                    </div><!-- end ngRepeat: level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy -->
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="clearfix"></div>
+    <div class="row">
+        <h1 class="jumbotron text-center ng-binding"></h1>
+        <!-- ngRepeat: level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy --><div class="row ng-scope" ng-repeat="level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy">
+            <div class="jumbotron">
+                <span class="text-center">
+                    <h2 ng-hide="level" class="ng-hide">Cantrips</h2>
+                    <h2 ng-show="level" class="ng-binding">Level 1</h2>
+                </span>
+            </div>
+            <!-- ngRepeat: spell in spellbookEditorCtrl.spellData | filter: { Level: level } | filter: spellbookEditorCtrl.spellKnown | orderBy: 'Name' track by $index --><spell-panel can-edit="false" ng-repeat="spell in spellbookEditorCtrl.spellData | filter: { Level: level } | filter: spellbookEditorCtrl.spellKnown | orderBy: &#39;Name&#39; track by $index" spell="spell" class="ng-scope ng-isolate-scope"><div class="panel unbroken">
+    <div>
+        <h2 ng-hide="editing" class="ng-binding">Do the thing 
+        <button ng-show="canEdit" class="btn ng-hide" ng-click="editing = true"><span class="glyphicon glyphicon-pencil"></span> Edit</button></h2>
+        <h2 ng-show="editing" class="ng-hide"><input type="text" ng-model="spell.Name" class="ng-pristine ng-untouched ng-valid"> <button class="btn" ng-click="spellCtrl.saveData()"><span class="glyphicon glyphicon-save"></span> Save</button></h2>
+    </div>
+
+    <p>
+        </p><div ng-hide="editing">
+            <em ng-show="spell.Level === 0" class="ng-binding ng-hide">Conjuration cantrip</em>
+            <em ng-show="spell.Level &gt; 0" class="ng-binding">1st-level conjuration</em>
+            <em ng-show="spell.IsRitual" class="ng-hide">(ritual)</em>
+        </div>
+        <div ng-show="editing" class="ng-hide">
+            <select ng-model="spell.Level" class="ng-pristine ng-untouched ng-valid">
+                <option value="0">0 (cantrip)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select> 
+            <select ng-model="spell.School" class="ng-pristine ng-untouched ng-valid">
+                <option value="Abjuration">Abjuration</option>
+                <option value="Conjuration">Conjuration</option>
+                <option value="Divination">Divination</option>
+                <option value="Enchantment">Enchantment</option>
+                <option value="Evocation">Evocation</option>
+                <option value="Illusion">Illusion</option>
+                <option value="Necromancy">Necromancy</option>
+                <option value="Transmutation">Transmutation</option>
+            </select>
+            <input type="checkbox" ng-model="spell.IsRitual" class="ng-pristine ng-untouched ng-valid"> Ritual
+        </div>
+    <p></p>
+    
+    <p>
+        </p><div><strong>Casting Time:</strong> <span ng-hide="editing" class="ng-binding">1 Round</span><div ng-show="editing" class="ng-hide"><input ng-model="spell.CastingTime" class="ng-pristine ng-untouched ng-valid"></div></div>
+        <div><strong>Range:</strong> <span ng-hide="editing" class="ng-binding">10 feet</span><div ng-show="editing" class="ng-hide"><input ng-model="spell.Range" class="ng-pristine ng-untouched ng-valid"></div></div>
+        <div>
+            <strong>Components:</strong>
+                <span ng-hide="editing" class="ng-binding">V, S, M (Some dust)</span>
+                <span ng-show="editing" class="ng-hide">
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsVerbal" class="ng-pristine ng-untouched ng-valid"> V</label>
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsSomatic" class="ng-pristine ng-untouched ng-valid"> S</label>
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsMaterial" class="ng-pristine ng-untouched ng-valid"> M</label> <input ng-show="spell.UsesComponentsMaterial" ng-model="spell.ComponentsMaterialDescription" class="ng-pristine ng-untouched ng-valid">
+                </span>
+        </div>
+        <div><strong>Duration:</strong> <span ng-hide="editing" class="ng-binding">1 Round</span><div ng-show="editing" class="ng-hide"><input ng-model="spell.Duration" class="ng-pristine ng-untouched ng-valid"></div></div>
+    <p></p>
+
+    <blockquote>
+        <!-- ngRepeat: paragraph in DescriptionAsParagraphs track by $index --><p class="spellDescription ng-binding ng-scope" ng-repeat="paragraph in DescriptionAsParagraphs track by $index" ng-hide="editing">Does the thing</p><!-- end ngRepeat: paragraph in DescriptionAsParagraphs track by $index -->
+        <p ng-show="editing" class="ng-hide">
+            <textarea class="form-control ng-pristine ng-untouched ng-valid" rows="10" ng-model="spell.Description"></textarea>
+        </p>
+        <p ng-show="spell.AtHigherLevels" class="ng-hide">
+            <strong>At Higher Levels.</strong> <span ng-hide="editing" class="ng-binding"></span></p><div ng-show="editing" class="ng-hide"><strong>At Higher Levels: </strong><input class="form-control ng-pristine ng-untouched ng-valid" ng-model="spell.AtHigherLevels"></div>
+        <p></p>
+    </blockquote>
+</div></spell-panel><!-- end ngRepeat: spell in spellbookEditorCtrl.spellData | filter: { Level: level } | filter: spellbookEditorCtrl.spellKnown | orderBy: 'Name' track by $index -->
+        </div><!-- end ngRepeat: level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy -->
+    </div>
+</div>
+
+<!-- For printing -->
+<div class="visible-print-inline">
+    <div class="page-break">
+        <h1 class="text-center"><strong class="ng-binding"></strong></h1>
+        <h2 class="text-center">Known Spells</h2>
+        <!-- ngRepeat: level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy --><div class="list-group ng-scope" ng-repeat="level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy">
+            <h4>
+                <span ng-show="level" class="ng-binding">Level 1</span>
+                <span ng-hide="level" class="ng-hide">Cantrips</span>
+            </h4>
+            <!-- ngRepeat: spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellKnown | filter:{Level:level} --><div class="list-group-item ng-binding ng-scope" ng-repeat="spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellKnown | filter:{Level:level}">
+                Do the thing (<em class="ng-binding">Conjuration</em>)<span class="badge ng-hide" ng-show="spell.IsRitual">R</span><span class="badge ng-hide" ng-show="spellbookEditorCtrl.spellPrepared(spell)">Prepared</span>
+            </div><!-- end ngRepeat: spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellKnown | filter:{Level:level} -->
+        </div><!-- end ngRepeat: level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy -->
+    </div>
+    <!-- ngRepeat: level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy --><div ng-repeat="level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy" class="ng-scope">
+        <div>
+            <span class="text-center">
+                <h2 ng-hide="level" class="ng-hide">Cantrips</h2>
+                <h2 ng-show="level" class="ng-binding">Level 1</h2>
+            </span>
+        </div>
+        <!-- ngRepeat: spell in spellbookEditorCtrl.spellData | filter: { Level: level } | filter: spellbookEditorCtrl.spellKnown | orderBy: 'Name' track by $index --><div ng-repeat="spell in spellbookEditorCtrl.spellData | filter: { Level: level } | filter: spellbookEditorCtrl.spellKnown | orderBy: &#39;Name&#39; track by $index" spell="spell" class="ng-scope">
+            <div class="unbroken">
+                <h4 class="ng-binding">Do the thing</h4>
+                <p>
+                    <em>
+                        <span ng-show="spell.Level" class="ng-binding">1st level conjuration</span>
+                        <span ng-hide="spell.Level" class="ng-binding ng-hide">Conjuration cantrip</span>
+                        <span ng-show="spell.IsRitual" class="ng-hide">(ritual)</span>
+                    </em>
+                </p>
+                <div>
+                    <div class="ng-binding"><strong>Casting Time:</strong> 1 Round</div>
+                    <div class="ng-binding"><strong>Range:</strong> 10 feet</div>
+                    <div><strong>Components:</strong> TBD</div>
+                    <div class="ng-binding"><strong>Duration:</strong> 1 Round</div>
+                </div>
+            </div>
+            <p class="ng-binding">
+                Does the thing
+            </p>
+            <p ng-show="spell.AtHigherLevels" class="ng-binding ng-hide">
+                <strong>At Higher Levels.</strong> 
+            </p>
+        </div><!-- end ngRepeat: spell in spellbookEditorCtrl.spellData | filter: { Level: level } | filter: spellbookEditorCtrl.spellKnown | orderBy: 'Name' track by $index -->
+    </div><!-- end ngRepeat: level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy -->
+</div></spellbook-editor>
+            </div>
+            
+            <div class="panel ng-hide" ng-show="mainCtrl.isSelected(3)">
+                <class-spell-list><div class="container">
+    <p class="col-sm-12">
+        </p><ul class="nav nav-pills">
+            <!-- ngRepeat: class in classSpellListCtrl.classData --><li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}" class="ng-scope"><a ng-click="classSpellListCtrl.selectClass(class)" href="http://spellbookgen.azurewebsites.net/" class="ng-binding">Bard</a></li><!-- end ngRepeat: class in classSpellListCtrl.classData --><li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}" class="ng-scope"><a ng-click="classSpellListCtrl.selectClass(class)" href="http://spellbookgen.azurewebsites.net/" class="ng-binding">Cleric</a></li><!-- end ngRepeat: class in classSpellListCtrl.classData --><li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}" class="ng-scope"><a ng-click="classSpellListCtrl.selectClass(class)" href="http://spellbookgen.azurewebsites.net/" class="ng-binding">Druid</a></li><!-- end ngRepeat: class in classSpellListCtrl.classData --><li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}" class="ng-scope"><a ng-click="classSpellListCtrl.selectClass(class)" href="http://spellbookgen.azurewebsites.net/" class="ng-binding">Paladin</a></li><!-- end ngRepeat: class in classSpellListCtrl.classData --><li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}" class="ng-scope"><a ng-click="classSpellListCtrl.selectClass(class)" href="http://spellbookgen.azurewebsites.net/" class="ng-binding">Ranger</a></li><!-- end ngRepeat: class in classSpellListCtrl.classData --><li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}" class="ng-scope"><a ng-click="classSpellListCtrl.selectClass(class)" href="http://spellbookgen.azurewebsites.net/" class="ng-binding">Sorceror</a></li><!-- end ngRepeat: class in classSpellListCtrl.classData --><li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}" class="ng-scope"><a ng-click="classSpellListCtrl.selectClass(class)" href="http://spellbookgen.azurewebsites.net/" class="ng-binding">Warlock</a></li><!-- end ngRepeat: class in classSpellListCtrl.classData --><li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}" class="ng-scope"><a ng-click="classSpellListCtrl.selectClass(class)" href="http://spellbookgen.azurewebsites.net/" class="ng-binding">Wizard</a></li><!-- end ngRepeat: class in classSpellListCtrl.classData -->
+        </ul>
+    <p></p>
+    
+    <div ng-show="classSpellListCtrl.selectedClass.ID" class="row ng-hide">
+        <h2 class="ng-binding">Unselected Spells</h2>
+        <form role="form" class="form-horizontal ng-pristine ng-valid">
+            <div class="form-group">
+                <label for="searchSpellName" class="control-label col-sm-2">Add By Name:</label>
+                <div class="col-sm-4">
+                    <input type="text" id="searchSpellName" class="form-control col-sm-4 ng-pristine ng-untouched ng-valid" ng-model="searchSpellName">
+                </div>
+            </div>
+            <div class="clearfix">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Name</th>
+                            <th>School</th>
+                        </tr>
+                    </thead>
+                    <tbody><!-- ngRepeat: spell in classSpellListCtrl.spellData | orderBy: 'Name' | filter: classSpellListCtrl.spellNotInSelectedClass | filter: { Name: searchSpellName } | limitTo:5 -->
+                </tbody></table>
+            </div>
+        </form>
+        <div class="list-group">
+            <!-- ngRepeat: level in classSpellListCtrl.spellLevelsForSelectedClass | orderBy:level -->
+        </div>
+    </div>
+</div></class-spell-list>
+            </div>
+            
+            <div class="panel ng-hide" ng-show="mainCtrl.isSelected(4)">
+                <spell-editor><div class="panel">
+    <form role="form" name="spellEditorForm" class="form-horizontal ng-pristine ng-invalid ng-invalid-required ng-valid-min ng-valid-max" ng-submit="spellEditorForm.$valid &amp;&amp; spellEditorCtrl.addSpell(spell)" novalidate="">
+        <div class="form-group">
+            <div class="form-group">
+                <label for="spellName" class="control-label col-sm-2">Name:</label>
+                <div class="col-sm-4">
+                    <input class="form-control ng-pristine ng-untouched ng-invalid ng-invalid-required" ng-model="spell.Name" id="spellName" placeholder="Name" required="">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellLevel" class="control-label col-sm-2">Level</label>
+                <div class="col-sm-4">
+                    <input class="form-control ng-pristine ng-untouched ng-valid-min ng-valid-max ng-invalid ng-invalid-required" type="number" min="0" max="9" ng-model="spell.Level" id="spellLevl" placeholder="Level (0-9, 0 for cantrip)" required="">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellSchool" class="control-label col-sm-2">School</label>
+                <div class="col-sm-4">
+                    <select ng-model="spell.School" required="" class="form-control ng-pristine ng-untouched ng-invalid ng-invalid-required"><option value="? undefined:undefined ?"></option>
+                        <option value="Abjuration">Abjuration</option>
+                        <option value="Conjuration">Conjuration</option>
+                        <option value="Divination">Divination</option>
+                        <option value="Enchantment">Enchantment</option>
+                        <option value="Evocation">Evocation</option>
+                        <option value="Illusion">Illusion</option>
+                        <option value="Necromancy">Necromancy</option>
+                        <option value="Transmutation">Transmutation</option>
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <label for="isRitual" class="checkbox-inline">
+                        <input type="checkbox" ng-model="spell.IsRitual" id="isRitual" class="ng-pristine ng-untouched ng-valid"> Ritual
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellCastingTime" class="control-label col-sm-2">Casting Time:</label>
+                <div class="col-sm-4">
+                    <input class="form-control ng-pristine ng-untouched ng-invalid ng-invalid-required" ng-model="spell.CastingTime" id="spellCastingTime" placeholder="Casting Time" required="">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellRange" class="control-label col-sm-2">Range:</label>
+                <div class="col-sm-4">
+                    <input class="form-control ng-pristine ng-untouched ng-invalid ng-invalid-required" ng-model="spell.Range" id="spellRange" placeholder="Range" required="">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="control-label col-sm-2">Components:</label>
+                <div class="col-sm-2">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="spell.UsesComponentsVerbal" id="spellUseVerbal" class="ng-pristine ng-untouched ng-valid"> V
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="spell.UsesComponentsSomatic" id="spellUseSomatic" class="ng-pristine ng-untouched ng-valid"> S
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="spell.UsesComponentsMaterial" id="spellUseMaterial" class="ng-pristine ng-untouched ng-valid"> M
+                    </label>
+                </div>
+                <div class="col-sm-4">
+                    <input class="form-control ng-pristine ng-untouched ng-valid ng-hide" ng-show="spell.UsesComponentsMaterial" ng-model="spell.ComponentsMaterialDescription" placeholder="Material description">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellDuration" class="control-label col-sm-2">Duration:</label>
+                <div class="col-sm-4">
+                    <input class="form-control ng-pristine ng-untouched ng-invalid ng-invalid-required" ng-model="spell.Duration" id="spellDuration" placeholder="Duration" required="">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="requiresConcentration" class="control-label col-sm-2">Requires Concentration:</label>
+                <div class="col-sm-4">
+                    <input type="checkbox" id="requiresConcentration" ng-model="spell.RequiresConcentration" ng-checked="spell.Duration.indexOf(&#39;Concentration&#39;) &gt; -1" disabled="" class="ng-pristine ng-untouched ng-valid">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellDescription" class="control-label col-sm-2">Description</label>
+                <div class="col-sm-6">
+                    <textarea rows="10" class="form-control ng-pristine ng-untouched ng-invalid ng-invalid-required" id="spellDescription" ng-model="spell.Description" placeholder="Spell Description here.  Insert new lines for new paragraphs." required=""></textarea>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellAtHigherLevels" class="control-label col-sm-2">At Higher Levels</label>
+                <div class="col-sm-6">
+                    <input class="form-control ng-pristine ng-untouched ng-valid" id="spellAtHigherLevels" ng-model="spell.AtHigherLevels" placeholder="At Higher Levels.  Optional.">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2 col-sm-offset-2">
+            <button type="submit" class="btn btn-lg bt-default">Submit</button>
+        </div>
+    </form>
+    <div class="clearfix"></div>
+    <spell-panel spell="spell" class="ng-isolate-scope"><div class="panel unbroken">
+    <div>
+        <h2 ng-hide="editing" class="ng-binding"> 
+        <button ng-show="canEdit" class="btn ng-hide" ng-click="editing = true"><span class="glyphicon glyphicon-pencil"></span> Edit</button></h2>
+        <h2 ng-show="editing" class="ng-hide"><input type="text" ng-model="spell.Name" class="ng-pristine ng-untouched ng-valid"> <button class="btn" ng-click="spellCtrl.saveData()"><span class="glyphicon glyphicon-save"></span> Save</button></h2>
+    </div>
+
+    <p>
+        </p><div ng-hide="editing">
+            <em ng-show="spell.Level === 0" class="ng-binding ng-hide"> cantrip</em>
+            <em ng-show="spell.Level &gt; 0" class="ng-binding ng-hide">undefinedth-level </em>
+            <em ng-show="spell.IsRitual" class="ng-hide">(ritual)</em>
+        </div>
+        <div ng-show="editing" class="ng-hide">
+            <select ng-model="spell.Level" class="ng-pristine ng-untouched ng-valid"><option value="? undefined:undefined ?"></option>
+                <option value="0">0 (cantrip)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select> 
+            <select ng-model="spell.School" class="ng-pristine ng-untouched ng-valid"><option value="? undefined:undefined ?"></option>
+                <option value="Abjuration">Abjuration</option>
+                <option value="Conjuration">Conjuration</option>
+                <option value="Divination">Divination</option>
+                <option value="Enchantment">Enchantment</option>
+                <option value="Evocation">Evocation</option>
+                <option value="Illusion">Illusion</option>
+                <option value="Necromancy">Necromancy</option>
+                <option value="Transmutation">Transmutation</option>
+            </select>
+            <input type="checkbox" ng-model="spell.IsRitual" class="ng-pristine ng-untouched ng-valid"> Ritual
+        </div>
+    <p></p>
+    
+    <p>
+        </p><div><strong>Casting Time:</strong> <span ng-hide="editing" class="ng-binding"></span><div ng-show="editing" class="ng-hide"><input ng-model="spell.CastingTime" class="ng-pristine ng-untouched ng-valid"></div></div>
+        <div><strong>Range:</strong> <span ng-hide="editing" class="ng-binding"></span><div ng-show="editing" class="ng-hide"><input ng-model="spell.Range" class="ng-pristine ng-untouched ng-valid"></div></div>
+        <div>
+            <strong>Components:</strong>
+                <span ng-hide="editing" class="ng-binding">None</span>
+                <span ng-show="editing" class="ng-hide">
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsVerbal" class="ng-pristine ng-untouched ng-valid"> V</label>
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsSomatic" class="ng-pristine ng-untouched ng-valid"> S</label>
+                    <label class="checkbox-inline"><input type="checkbox" ng-model="spell.UsesComponentsMaterial" class="ng-pristine ng-untouched ng-valid"> M</label> <input ng-show="spell.UsesComponentsMaterial" ng-model="spell.ComponentsMaterialDescription" class="ng-pristine ng-untouched ng-valid ng-hide">
+                </span>
+        </div>
+        <div><strong>Duration:</strong> <span ng-hide="editing" class="ng-binding"></span><div ng-show="editing" class="ng-hide"><input ng-model="spell.Duration" class="ng-pristine ng-untouched ng-valid"></div></div>
+    <p></p>
+
+    <blockquote>
+        <!-- ngRepeat: paragraph in DescriptionAsParagraphs track by $index -->
+        <p ng-show="editing" class="ng-hide">
+            <textarea class="form-control ng-pristine ng-untouched ng-valid" rows="10" ng-model="spell.Description"></textarea>
+        </p>
+        <p ng-show="spell.AtHigherLevels" class="ng-hide">
+            <strong>At Higher Levels.</strong> <span ng-hide="editing" class="ng-binding"></span></p><div ng-show="editing" class="ng-hide"><strong>At Higher Levels: </strong><input class="form-control ng-pristine ng-untouched ng-valid" ng-model="spell.AtHigherLevels"></div>
+        <p></p>
+    </blockquote>
+</div></spell-panel>
+    <div class="clearfix"></div>
+</div></spell-editor>
+                <p>
+                    </p><p><em>Paste on the left to remove new-lines, copy from the right.</em></p>
+                    <temp-text-fixer><form class="ng-pristine ng-valid">
+    <textarea ng-model="tempText" ng-click="tempText = &#39;&#39;" class="ng-pristine ng-untouched ng-valid"></textarea>
+    <textarea readonly="" class="ng-binding"></textarea>
+    <div>
+        <button type="button" class="btn btn-error" ng-click="tempText = &#39;&#39;">Clear</button>
+    </div>
+</form></temp-text-fixer>
+                <p></p>
+            </div>
+            
+            <div class="panel ng-hide" ng-show="mainCtrl.isSelected(5)">
+                <import-export><div class="jumbotron">
+    <h1>IMPORTANT</h1>
+    <p>Check out the about page for more information.  DO NOT SHARE FILES.  DO NOT HOST FILES.  This section is only so that you can keep a backup
+    and transfer spellbooks to your smartphone or tablet for easier viewing.</p>
+    <p>All your data is being saved locally as you make changes.  This means that if you close the browser and re-open it, you'll have everything
+    you entered ready to go.  If you reboot your machine, you'll still keep all your stuff intact.
+    </p>
+    <p>However, if you use a different browser or use this application from another computer or device, you'll have no access
+    to anything you did.  And if you clear your cache or delete local content, you'll lose everything if you didn't export a backup.
+    That's what this page is for.</p>
+</div>
+<div class="panel">
+    <h2>Export</h2>
+    <p>
+        You can export all your data here into a JSON file.  This file is just text that you can
+        open in Notepad or any text editor and contains all the data you've entered.  You can then
+        load this file directly into this application again at any time.
+    </p>
+    <p>
+        Once it's downloaded, you can
+        manually edit data in any text editor, but be careful!  One wrong keystroke can render the entire
+        file unusable.  Manual edit at your own risk and only if you understand the JSON format!
+    </p>
+    <button class="btn btn-success btn-lg" ng-click="importExportCtrl.exportJSON()">Export</button>
+</div>
+<div class="panel">
+    <h2>Import</h2>
+    <p>
+        You can import previously saved data here.  The file isn't actually uploaded, it's just read locally.  As soon as you import data,
+        all currently entered data is <strong><em>OVERWRITTEN</em></strong>, so be sure to export your current set first if you're not sure!
+    </p>
+    <div class="form-group">
+        <input type="file" class="form-control" on-read-file="importExportCtrl.importJSON($fileContent)">
+    </div>
+    <p ng-show="importExportCtrl.importSuccessful" class="bg-success ng-hide">
+        Import successful!
+    </p>
+</div></import-export>
+            </div>
+            
+            <div class="panel ng-hide" ng-show="mainCtrl.isSelected(6)">
+                <about><h2>What is this?</h2>
+<blockquote>
+    This is a hobby project created for learning AngularJS to help generate spellbooks and search
+    through spells for Dungeons and Dragons.  Using this tool you can create and edit your own spellbooks, keeping track
+    of known and prepared spells, and creating custom spells (DM-approved, of course!).  This is
+    intended as a tool to help spellcasters make sense of the enormous selection of spells at their disposal, and create
+    streamlined print-outs to facilitate play instead of trying to look up a spell every time with
+    a million paper bookmarks all over.
+</blockquote>
+
+<h2>What is this <em>not?</em></h2>
+<blockquote>
+    This is <em><strong>NOT</strong></em> a database of spells.  No copyright infringement is intended,
+    and to actually use this site you'll need a copy of the Player's Handbook yourself.  Go buy one, 5e is awesome!
+    Do <em><strong>NOT</strong></em> share created files of spell lists or spell books.  Let's keep this site
+    up and running and Wizards of the Coast happy, please!  This does mean you'll have to input your own spells,
+    but you can input as little or as much as you'd like and save locally as you go, filling in more
+    as you feel it's needed.  The only thing this site provides is a list of class names and the tools
+    to fill things in for yourself.  NOTHING IS SAVED TO THE SERVER.  EVER.  DO NOT ASK FOR THIS FEATURE.  It's purely just a
+    javascript SPA (Single Page Application) that can load and save <em>local</em> JSON data that you've created yourself.  It's basically
+    just a glorified text editor that helps you organize your own data that <em>you have provided yourself</em>.  Have I emphasized that enough?
+</blockquote>
+
+<h2>What, nothing's saved to the server?</h2>
+<blockquote>
+    Nothing.  There is no storage on the server for anything.  This is 100% intended to avoid legal trouble and discourage piracy.
+    All data is loaded and saved locally.
+</blockquote>
+
+<h2>So what happens if I close my browser?</h2>
+<blockquote>
+    All data is saved locally in your browser's local storage as soon as you make any changes.  If you close your browser and come
+    back a week later, all your data will be there and intact.  It's encouraged that you save local backups using the Export feature
+    on the Import/Export screen, and you'll need to use this feature if you want to transfer your data to a different device (such as a tablet).
+</blockquote></about>
+            </div>
+            
+            <div class="panel ng-hide" ng-show="mainCtrl.isSelected(7)">
+                <help><h2>Getting Started</h2>
+
+<blockquote>
+    Check out the about page for more details as to why, but unfortunately I can't host any data containing copyrighted information.  Crazy, right?
+    This means that you'll need to input your own data.  Fortunately it's easy!  And once you've input your data, you can export it to use your data on other devices
+    or to let others in your group use it for their spellbooks.
+</blockquote>
+
+<h2>Adding Spells</h2>
+
+<blockquote>
+    The first thing you'll need to do is add in some spells.  Go to the Add Spells tab and enter information for a spell, then hit Submit.  After you hit Submit,
+    the spell is now in the system.  If you want to take a look at it, you can jump over to the Quick Search tab, which will list all spells that are currently in the system.
+    Switching tabs won't cause you to lose any information on other tabs, so you're safe to jump around all you'd like.  As a suggestion, simply entering the page number reference
+    as the description can make initial spell entry easy.  You can always go back and edit spells later to add more details or a full description.
+</blockquote>
+
+<h2>Assigning spells to classes</h2>
+
+<blockquote>
+    You probably noticed that there's nowhere to indicate what classes can cast what spells.  That's the next step.  Go to Class Spell Lists and select a class.  Then enter a
+    spell name and select the spell you want to add when it comes up in the search results just below.  Rinse and repeat for each class and each spell for that class.  As before,
+    you can always come back and edit these if you need to.  Now you're ready to make a spellbook!
+</blockquote>
+
+<h2>Making a spellbook</h2>
+
+<blockquote>
+    So now you've got your spells ready to go, and you want to put them in a spellbook.  Click on the Spellbooks tab, then click that shiny green button next to New Spellbook.
+    Now select a class for your spellbook to use.  The list of all spells that are available to this class will be listed on the column to the left.  To add a spell to your Known Spells
+    list, just click on the spell.  To remove it, click on it again.  Once spells are in your Known Spells list, you can optionally click on them to mark them as Prepared, depending on
+    your class's spellcasting.  You don't have to do this, though.  Also note that if you need to borrow spells from another class, either for multiclassing, cleric/druid/pally domain things, or for some feats/racial abilities,
+    just select a different Class and pick out the spell.  You can mix and match as your character's knowledge demands.  Just, you know... don't cheat.  Cheating makes DMs sad.  Keep in mind
+    that no actual validation checks are done, so it's possible to make a spellbook containing every spell in the game.  You'll have to reference your class's spellcasting information to
+    see what restrictions you have and apply them yourself.
+</blockquote>
+
+<h2>Printing your spellbook</h2>
+
+<blockquote>
+    So you've got a spellbook!  Great!  It'll automatically save any updates you make, so you can use this app as your interactive spellbook if you'd like.  Or if you prefer paper because
+    you're a classy individual, you can print out your spellbook for easy use!  Just go to your Spellbooks tab, select the spellbook you want to print, and press Print in your browser.
+    Easy as that.  You can print to XPS or PDF for a nice, neat document that you can view on a tablet or smartphone easily as another option.  Note that Prepared spells will be marked permanently,
+    which you may or may not want.
+</blockquote></help>
+            </div>
+        </div>
+    
+
+</body></html>
