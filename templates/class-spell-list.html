@@ -1,0 +1,48 @@
+<div class="container">
+    <p class="col-sm-12">
+        <ul class="nav nav-pills">
+            <li ng-repeat="class in classSpellListCtrl.classData" ng-class="{active:class.ID === classSpellListCtrl.selectedClass.ID}"><a ng-click="classSpellListCtrl.selectClass(class)" href>{{class.Name}}</a></li>
+        </ul>
+    </p>
+    
+    <div ng-show="classSpellListCtrl.selectedClass.ID" class="row">
+        <h2>{{classSpellListCtrl.selectedClass.Name}} Spells</h2>
+        <form role="form" class='form-horizontal'>
+            <div class="form-group">
+                <label for="searchSpellName" class="control-label col-sm-2">Add By Name:</label>
+                <div class="col-sm-4">
+                    <input type="text" id="searchSpellName" class="form-control col-sm-4" ng-model="searchSpellName" />
+                </div>
+            </div>
+            <div class="clearfix">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Name</th>
+                            <th>School</th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="spell in classSpellListCtrl.spellData | orderBy: 'Name' | filter: classSpellListCtrl.spellNotInSelectedClass | filter: { Name: searchSpellName } | limitTo:5">
+                        <td>{{spell.Level}}</td>
+                        <td><button class="btn btn-success btn-xs" ng-click="classSpellListCtrl.addSpell(spell)">+</button> {{spell.Name}}</td>
+                        <td>{{spell.School}}</td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+        <div class="list-group" class="col-sm-6">
+            <div class="list-group-item" ng-repeat="level in classSpellListCtrl.spellLevelsForSelectedClass | orderBy:level">
+                <h3>
+                    <span ng-show="level">Level {{level}}</span>
+                    <span ng-hide="level">Cantrips</span>
+                </h3>
+                <div class="list-group-item"
+                    ng-repeat="spell in classSpellListCtrl.spellData | filter:classSpellListCtrl.spellInSelectedClass | filter:{Level:level}">
+                    <button class="btn btn-danger btn-xs" ng-click="classSpellListCtrl.removeSpell(spell)">X</button>
+                    {{spell.Name}} (<em>{{spell.School}}</em>)<span class="badge badge-success" ng-show="spell.IsRitual">Ritual</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

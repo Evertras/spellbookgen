@@ -1,0 +1,155 @@
+<div class="container hidden-print">
+    <div class="col-sm-2">
+        <div class="list-group">
+            <div class="list-group-item selectable"
+                ng-repeat="spellbook in spellbookEditorCtrl.spellbookData" ng-click="spellbookEditorCtrl.selectedSpellbook = spellbook"
+                ng-class="{active: spellbook == spellbookEditorCtrl.selectedSpellbook}">
+                {{spellbook.Name}}
+            </div>
+            <div class="list-group-item"><button class="btn btn-success btn-xs" ng-click="spellbookEditorCtrl.newSpellbook()">+</button> <strong>New Spellbook</strong></div>
+        </div>
+    </div>
+    <div class="col-sm-10">
+        <p class="row">
+            <button class="btn btn-lg btn-primary" ng-class="{active: spellbookEditorCtrl.displayListEditor}" ng-click="spellbookEditorCtrl.displayListEditor = !spellbookEditorCtrl.displayListEditor">Show Editor</button>
+        </p>
+        <form role="form" class="form-horizontal" ng-show="spellbookEditorCtrl.displayListEditor">
+            <div class="form-group">
+                <label for="spellbookName" class="col-sm-1 control-label">Name:</label>
+                <div class="col-sm-7">
+                    <input type="text" id="spellbookName" class="form-control" ng-model="spellbookEditorCtrl.selectedSpellbook.Name" placeholder="Name of your character or spellbook" />
+                </div>
+                <div class="col-sm-2">
+                    <button class="btn btn-danger" ng-click="spellbookEditorCtrl.deleteSpellbook()">DELETE</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="spellbookClass" class="col-sm-1 control-label">Class:</label>
+                <div class="col-sm-5">
+                    <select class="form-control"
+                        ng-model="spellbookEditorCtrl.selectedSpellbook.selectedClassID"
+                        ng-options="classData.ID as classData.Name for classData in spellbookEditorCtrl.classData">
+                    </select>
+                </div>
+                <div class="col-sm-2">
+                    <button class="btn" ng-click="spellbookEditorCtrl.showRandomSettings = !spellbookEditorCtrl.showRandomSettings">
+                        Random
+                        <span class="glyphicon glyphicon-menu-down" ng-hide="spellbookEditorCtrl.showRandomSettings"></span>
+                        <span class="glyphicon glyphicon-menu-up" ng-show="spellbookEditorCtrl.showRandomSettings"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group" ng-show="spellbookEditorCtrl.showRandomSettings">
+                <div class="col-sm-1">
+                    <label class="control-label" for="randomLevel">Level:</label>
+                </div>
+                <div class="col-sm-4">
+                    <input id="randomLevel" type="number" class="form-control" ng-model="spellbookEditorCtrl.randomLevel" />
+                </div>
+                <div>
+                    <p><em>Note: hitting Generate will remove all existing spells from this spellbook and replace them with the ones generated!</em></p>
+                    <button class="btn btn-warning" ng-click="spellbookEditorCtrl.generateRandom()">Generate Random Spellbook</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <h2>{{spellbookEditorCtrl.selectedClass.Name}} Spells</h2>
+                    <p><em>Click to add or remove a spell from your spellbook</em></p>
+                    <div class="list-group-item" ng-repeat="level in spellbookEditorCtrl.spellLevelsForSelectedClass | orderBy:level">
+                        <h4>
+                            <span ng-show="level">Level {{level}}</span>
+                            <span ng-hide="level">Cantrips</span>
+                        </h4>
+                        <div class="list-group-item selectable"
+                            ng-repeat="spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellInSelectedClass | filter:{Level:level}"
+                            ng-class="{ 'list-group-item-success': spellbookEditorCtrl.spellKnown(spell), 'list-group-item-danger': !spellbookEditorCtrl.spellKnown(spell) }"
+                            ng-click="spellbookEditorCtrl.toggleSpellKnown(spell)">
+                            {{spell.Name}} (<em>{{spell.School}}</em>)<span class="badge" ng-show="spell.IsRitual">R</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-sm-6">
+                    <h2>Known Spells</h2>
+                    <p><em>Click to mark a spell as Prepared</em></p>
+                    <div class="list-group-item" ng-repeat="level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy">
+                        <h4>
+                            <span ng-show="level">Level {{level}}</span>
+                            <span ng-hide="level">Cantrips</span>
+                        </h4>
+                        <div class="list-group-item selectable"
+                            ng-repeat="spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellKnown | filter:{Level:level}"
+                            ng-class="{ active: spellbookEditorCtrl.spellPrepared(spell) }"
+                            ng-click="spellbookEditorCtrl.toggleSpellPrepared(spell)">
+                            {{spell.Name}} (<em>{{spell.School}}</em>)<span class="badge" ng-show="spell.IsRitual">R</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="clearfix"></div>
+    <div class="row">
+        <h1 class="jumbotron text-center">{{spellbookEditorCtrl.selectedSpellbook.Name}}</h1>
+        <div class="row" ng-repeat="level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy">
+            <div class="jumbotron">
+                <span class="text-center">
+                    <h2 ng-hide="level">Cantrips</h2>
+                    <h2 ng-show="level">Level {{level}}</h2>
+                </span>
+            </div>
+            <spell-panel can-edit="false" ng-repeat="spell in spellbookEditorCtrl.spellData | filter: { Level: level } | filter: spellbookEditorCtrl.spellKnown | orderBy: 'Name' track by $index" spell="spell"></spell-panel>
+        </div>
+    </div>
+</div>
+
+<!-- For printing -->
+<div class="visible-print-inline">
+    <div class="page-break">
+        <h1 class="text-center"><strong>{{spellbookEditorCtrl.selectedSpellbook.Name}}</strong></h1>
+        <h2 class="text-center">Known Spells</h2>
+        <div class="list-group" ng-repeat="level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy">
+            <h4>
+                <span ng-show="level">Level {{level}}</span>
+                <span ng-hide="level">Cantrips</span>
+            </h4>
+            <div class="list-group-item"
+                ng-repeat="spell in spellbookEditorCtrl.spellData | filter:spellbookEditorCtrl.spellKnown | filter:{Level:level}">
+                {{spell.Name}} (<em>{{spell.School}}</em>)<span class="badge" ng-show="spell.IsRitual">R</span><span class="badge" ng-show="spellbookEditorCtrl.spellPrepared(spell)">Prepared</span>
+            </div>
+        </div>
+    </div>
+    <div ng-repeat="level in spellbookEditorCtrl.spellLevelsForKnownSpells | orderBy">
+        <div>
+            <span class="text-center">
+                <h2 ng-hide="level">Cantrips</h2>
+                <h2 ng-show="level">Level {{level}}</h2>
+            </span>
+        </div>
+        <div ng-repeat="spell in spellbookEditorCtrl.spellData | filter: { Level: level } | filter: spellbookEditorCtrl.spellKnown | orderBy: 'Name' track by $index" spell="spell">
+            <div class="unbroken">
+                <h4>{{spell.Name}}</h4>
+                <p>
+                    <em>
+                        <span ng-show="spell.Level">{{spell.Level | nth}} level {{spell.School | lowercase}}</span>
+                        <span ng-hide="spell.Level">{{spell.School}} cantrip</span>
+                        <span ng-show="spell.IsRitual">(ritual)</span>
+                    </em>
+                </p>
+                <div>
+                    <div><strong>Casting Time:</strong> {{spell.CastingTime}}</div>
+                    <div><strong>Range:</strong> {{spell.Range}}</div>
+                    <div><strong>Components:</strong> TBD</div>
+                    <div><strong>Duration:</strong> {{spell.Duration}}</div>
+                </div>
+            </div>
+            <p>
+                {{spell.Description}}
+            </p>
+            <p ng-show="spell.AtHigherLevels">
+                <strong>At Higher Levels.</strong> {{spell.AtHigherLevels}}
+            </p>
+        </div>
+    </div>
+</div>

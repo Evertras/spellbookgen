@@ -1,0 +1,11 @@
+<div class="container">
+    <div>
+        Name: <input type="text" class="form-control" ng-model="searchName" placeholder="Enter any part of the spell's name here" />
+    </div>
+    <p>
+        <em>Maximum 20 results displayed.</em>
+    </p>
+    <div class="row">
+        <spell-panel can-edit="true" ng-repeat="spell in spellListCtrl.spells | filter:{ Name: searchName } | orderBy: 'Name' | limitTo:20 track by $index" spell="spell"></spell-panel>
+    </div>
+</div>

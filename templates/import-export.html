@@ -1,0 +1,38 @@
+<div class="jumbotron">
+    <h1>IMPORTANT</h1>
+    <p>Check out the about page for more information.  DO NOT SHARE FILES.  DO NOT HOST FILES.  This section is only so that you can keep a backup
+    and transfer spellbooks to your smartphone or tablet for easier viewing.</p>
+    <p>All your data is being saved locally as you make changes.  This means that if you close the browser and re-open it, you'll have everything
+    you entered ready to go.  If you reboot your machine, you'll still keep all your stuff intact.
+    </p>
+    <p>However, if you use a different browser or use this application from another computer or device, you'll have no access
+    to anything you did.  And if you clear your cache or delete local content, you'll lose everything if you didn't export a backup.
+    That's what this page is for.</p>
+</div>
+<div class="panel">
+    <h2>Export</h2>
+    <p>
+        You can export all your data here into a JSON file.  This file is just text that you can
+        open in Notepad or any text editor and contains all the data you've entered.  You can then
+        load this file directly into this application again at any time.
+    </p>
+    <p>
+        Once it's downloaded, you can
+        manually edit data in any text editor, but be careful!  One wrong keystroke can render the entire
+        file unusable.  Manual edit at your own risk and only if you understand the JSON format!
+    </p>
+    <button class="btn btn-success btn-lg" ng-click="importExportCtrl.exportJSON()">Export</button>
+</div>
+<div class="panel">
+    <h2>Import</h2>
+    <p>
+        You can import previously saved data here.  The file isn't actually uploaded, it's just read locally.  As soon as you import data,
+        all currently entered data is <strong><em>OVERWRITTEN</em></strong>, so be sure to export your current set first if you're not sure!
+    </p>
+    <div class="form-group">
+        <input type="file" class="form-control" on-read-file="importExportCtrl.importJSON($fileContent)" />
+    </div>
+    <p ng-show="importExportCtrl.importSuccessful" class="bg-success">
+        Import successful!
+    </p>
+</div>
