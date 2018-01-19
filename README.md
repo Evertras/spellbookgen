@@ -1,1 +1,1 @@
-"# spellbookgen" 
+# spellbookgen
